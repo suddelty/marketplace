@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Dropdown, { type Option } from "react-dropdown";
+import React from "react";
+import type { Option } from "react-dropdown";
 import { withTranslation } from "react-i18next";
 import type { TabItemConfig } from "../types/marketplace-types";
 
@@ -43,120 +43,29 @@ class TabBarItem extends React.Component<{
 
 const TabBarItemWithTranslation = withTranslation()(TabBarItem);
 
-interface TabBarMoreProps {
-  items: TabOptionConfig[];
-  switchTo: (option: Option) => void;
-}
-const TabBarMore = React.memo<TabBarMoreProps>(function TabBarMore({ items, switchTo }: TabBarMoreProps) {
-  return (
-    <li className="marketplace-tabBar-headerItem">
-      <Dropdown className="main-type-mestoBold" options={items} value="More" placeholder="More" onChange={switchTo} />
-    </li>
-  );
-});
-
-export const TopBarContent = (props: { links: TabItemConfig[]; activeLink: string; switchCallback: (option: Option) => void }) => {
-  const tabBar = useRef<HTMLElement | null>(null);
-
-  const contextHandler = useCallback(() => {
-    // Move the marketplace-tabBar item to the main-topBar-topbarContent div
-    const topBarContent = document.querySelector(".main-topBar-topbarContentWrapper");
-    if (!tabBar?.current || !topBarContent) {
-      setTimeout(contextHandler, 100);
-      return;
-    }
-
-    topBarContent.appendChild(tabBar.current);
-  }, [tabBar.current]);
-
-  useEffect(() => {
-    contextHandler();
-    return () => (tabBar.current || document.querySelector(".marketplace-tabBar"))?.remove();
-  });
-
-  return <TabBar ref={tabBar} links={props.links} activeLink={props.activeLink} switchCallback={props.switchCallback} />;
-};
-
 interface TabBarProps {
   links: TabItemConfig[];
   activeLink: string;
   switchCallback: (option: Option) => void;
 }
-const TabBar = React.forwardRef(({ links, activeLink, switchCallback }: TabBarProps, ref: React.ForwardedRef<HTMLElement>) => {
-  const tabBarRef = useRef<HTMLUListElement | null>(null);
-  const [childrenSizes, setChildrenSizes] = useState([0]);
-  const [availableSpace, setAvailableSpace] = useState(0);
-  const [droplistItem, setDroplistItems] = useState([0]);
 
-  // Key is the tab name, value is also the tab name, active is if it's active
-  const options = links.map(({ name, enabled }) => {
-    const active = name === activeLink;
-    return { label: name, value: name, active, enabled } as TabOptionConfig;
-  });
-
-  useEffect(() => {
-    if (!tabBarRef.current) return;
-
-    const observer = new ResizeObserver((entries) => setAvailableSpace(entries[0].contentRect.width));
-    observer.observe(tabBarRef.current);
-    return () => {
-      observer.disconnect();
-    };
-  }, [tabBarRef.current]);
-
-  useEffect(() => {
-    if (!tabBarRef.current) return;
-
-    const children = Array.from(tabBarRef.current.children);
-    const tabbarItemSizes = children.map((child) => child.clientWidth);
-
-    setChildrenSizes(tabbarItemSizes);
-  }, [links]);
-
-  useEffect(() => {
-    if (!tabBarRef.current) return;
-
-    const totalSize = childrenSizes.reduce((a, b) => a + b, 0);
-
-    // Can we render everything?
-    if (totalSize <= availableSpace) {
-      setDroplistItems([]);
-      return;
-    }
-
-    // The `More` button can be set to _any_ of the children. So we
-    // reserve space for the largest item instead of always taking
-    // the last item.
-    const viewMoreButtonSize = Math.max(...childrenSizes);
-
-    // Figure out how many children we can render while also showing
-    // the More button
-    const itemsToHide = [] as number[];
-    let stopWidth = viewMoreButtonSize;
-
-    childrenSizes.forEach((childWidth, i) => {
-      if (availableSpace >= stopWidth + childWidth) {
-        stopWidth += childWidth;
-      } else {
-        itemsToHide.push(i);
-      }
+// Rendered in the marketplace page. Spotify 1.3 no longer exposes a usable
+// top-bar content slot, so portaling into `.main-topBar-*` hid every tab.
+export const TopBarContent = (props: TabBarProps) => {
+  const options = props.links
+    .filter(({ enabled }) => enabled)
+    .map(({ name }) => {
+      const active = name === props.activeLink;
+      return { label: name, value: name, active, enabled: true } as TabOptionConfig;
     });
 
-    setDroplistItems(itemsToHide);
-  }, [availableSpace, childrenSizes]);
-
   return (
-    <nav className="marketplace-tabBar marketplace-tabBar-nav" ref={ref}>
-      <ul className="marketplace-tabBar-header" ref={tabBarRef}>
-        {options
-          .filter((_, id) => !droplistItem.includes(id))
-          .map((item) => (
-            <TabBarItemWithTranslation key={item.value} item={item} switchTo={switchCallback} />
-          ))}
-        {droplistItem.length || childrenSizes.length === 0 ? (
-          <TabBarMore items={droplistItem.map((i) => options[i]).filter((i) => i)} switchTo={switchCallback} />
-        ) : null}
+    <nav className="marketplace-tabBar marketplace-tabBar-nav">
+      <ul className="marketplace-tabBar-header">
+        {options.map((item) => (
+          <TabBarItemWithTranslation key={item.value} item={item} switchTo={props.switchCallback} />
+        ))}
       </ul>
     </nav>
   );
-});
+};

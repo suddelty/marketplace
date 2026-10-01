@@ -586,74 +586,77 @@ class Grid extends React.Component<
     return (
       <section className="contentSpacing">
         <div className="marketplace-header">
-          <div className="marketplace-header__left">
-            {this.state.newUpdate ? (
-              <button
-                type="button"
-                title={t("grid.newUpdate")}
-                className="marketplace-header-icon-button"
-                id="marketplace-update"
-                onClick={() => openModal("UPDATE")}
-              >
-                <DownloadIcon />
-                &nbsp;{this.state.version}
-              </button>
-            ) : null}
-            {/* Generate a new box for sorting options */}
-            <h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
-            <SortBox
-              onChange={(value) => this.updateSort(value)}
-              sortBoxOptions={generateSortOptions(t)}
-              sortBySelectedFn={(a) => a.key === this.CONFIG.sort}
-            />
-          </div>
-          <div className="marketplace-header__right">
-            {/* Show theme developer tools button if themeDevTools is enabled */}
-            {this.CONFIG.visual.themeDevTools ? (
-              <Tooltip label={t("devTools.title")} renderInline={true} placement="bottom">
+          <TopBarContent switchCallback={this.switchTo.bind(this)} links={this.CONFIG.tabs} activeLink={this.CONFIG.activeTab} />
+          <div className="marketplace-header__toolbar">
+            <div className="marketplace-header__left">
+              {this.state.newUpdate ? (
                 <button
                   type="button"
-                  aria-label={t("devTools.title")}
+                  title={t("grid.newUpdate")}
                   className="marketplace-header-icon-button"
-                  onClick={() => openModal("THEME_DEV_TOOLS")}
+                  id="marketplace-update"
+                  onClick={() => openModal("UPDATE")}
                 >
-                  <ThemeDeveloperToolsIcon />
+                  <DownloadIcon />
+                  &nbsp;{this.state.version}
                 </button>
-              </Tooltip>
-            ) : null}
-            {/* Show colour scheme dropdown if there is a theme with schemes installed */}
-            {this.state.activeScheme ? (
+              ) : null}
+              {/* Generate a new box for sorting options */}
+              <h2 className="marketplace-header__label">{t("grid.sort.label")}</h2>
               <SortBox
-                onChange={(value) => this.updateColourSchemes(this.state.schemes, value)}
-                // TODO: Make this compatible with the changes to the theme install process: need to create a method to update the scheme options without a full reload.
-                sortBoxOptions={generateSchemesOptions(this.state.schemes)}
-                // It doesn't work when I directly use CONFIG.theme.activeScheme in the sortBySelectedFn
-                // because it hardcodes the value into the fn
-                sortBySelectedFn={(a) => a.key === this.getActiveScheme()}
-              />
-            ) : null}
-            <div className="searchbar--bar__wrapper">
-              <input
-                className="searchbar-bar"
-                type="text"
-                placeholder={`${t("grid.search")} ${t(`tabs.${this.CONFIG.activeTab}`)}...`}
-                value={this.state.searchValue}
-                onChange={(event) => {
-                  this.setState({ searchValue: event.target.value });
-                }}
+                onChange={(value) => this.updateSort(value)}
+                sortBoxOptions={generateSortOptions(t)}
+                sortBySelectedFn={(a) => a.key === this.CONFIG.sort}
               />
             </div>
-            <Tooltip label={t("settings.title")} renderInline={true} placement="bottom">
-              <button
-                type="button"
-                aria-label={t("settings.title")}
-                className="marketplace-header-icon-button"
-                id="marketplace-settings-button"
-                onClick={() => openModal("SETTINGS", this.CONFIG, this.updateAppConfig)}
-              >
-                <SettingsIcon />
-              </button>
-            </Tooltip>
+            <div className="marketplace-header__right">
+              {/* Show theme developer tools button if themeDevTools is enabled */}
+              {this.CONFIG.visual.themeDevTools ? (
+                <Tooltip label={t("devTools.title")} renderInline={true} placement="bottom">
+                  <button
+                    type="button"
+                    aria-label={t("devTools.title")}
+                    className="marketplace-header-icon-button"
+                    onClick={() => openModal("THEME_DEV_TOOLS")}
+                  >
+                    <ThemeDeveloperToolsIcon />
+                  </button>
+                </Tooltip>
+              ) : null}
+              {/* Show colour scheme dropdown if there is a theme with schemes installed */}
+              {this.state.activeScheme ? (
+                <SortBox
+                  onChange={(value) => this.updateColourSchemes(this.state.schemes, value)}
+                  // TODO: Make this compatible with the changes to the theme install process: need to create a method to update the scheme options without a full reload.
+                  sortBoxOptions={generateSchemesOptions(this.state.schemes)}
+                  // It doesn't work when I directly use CONFIG.theme.activeScheme in the sortBySelectedFn
+                  // because it hardcodes the value into the fn
+                  sortBySelectedFn={(a) => a.key === this.getActiveScheme()}
+                />
+              ) : null}
+              <div className="searchbar--bar__wrapper">
+                <input
+                  className="searchbar-bar"
+                  type="text"
+                  placeholder={`${t("grid.search")} ${t(`tabs.${this.CONFIG.activeTab}`)}...`}
+                  value={this.state.searchValue}
+                  onChange={(event) => {
+                    this.setState({ searchValue: event.target.value });
+                  }}
+                />
+              </div>
+              <Tooltip label={t("settings.title")} renderInline={true} placement="bottom">
+                <button
+                  type="button"
+                  aria-label={t("settings.title")}
+                  className="marketplace-header-icon-button"
+                  id="marketplace-settings-button"
+                  onClick={() => openModal("SETTINGS", this.CONFIG, this.updateAppConfig)}
+                >
+                  <SettingsIcon />
+                </button>
+              </Tooltip>
+            </div>
           </div>
         </div>
         {cardSections}
@@ -679,7 +682,6 @@ class Grid extends React.Component<
             <div style={{ height: "64px" }} />
           )}
         </footer>
-        <TopBarContent switchCallback={this.switchTo.bind(this)} links={this.CONFIG.tabs} activeLink={this.CONFIG.activeTab} />
       </section>
     );
   }

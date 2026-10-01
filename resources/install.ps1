@@ -104,7 +104,7 @@ Write-Host -Object 'Downloading Marketplace...' -ForegroundColor 'Cyan'
 $marketArchivePath = "$marketAppPath\marketplace.zip"
 $unpackedFolderPath = "$marketAppPath\marketplace-dist"
 $Parameters = @{
-  Uri             = 'https://github.com/spicetify/marketplace/releases/latest/download/marketplace.zip'
+  Uri             = 'https://github.com/suddelty/marketplace/releases/download/v1.0.11-grid-tabs/marketplace.zip'
   UseBasicParsing = $true
   OutFile         = $marketArchivePath
 }
@@ -120,7 +120,7 @@ Invoke-Spicetify "config" "inject_css" "1" "replace_colors" "1"
 
 Write-Host -Object 'Downloading placeholder theme...' -ForegroundColor 'Cyan'
 $Parameters = @{
-  Uri             = 'https://raw.githubusercontent.com/spicetify/marketplace/main/resources/color.ini'
+  Uri             = 'https://raw.githubusercontent.com/suddelty/marketplace/fix/spotify-1.3-grid-and-tabs/resources/color.ini'
   UseBasicParsing = $true
   OutFile         = "$marketThemePath\color.ini"
 }

@@ -6,14 +6,11 @@ set -e
 
    
 # download uri
-releases_uri=https://github.com/spicetify/marketplace/releases
+releases_uri=https://github.com/suddelty/marketplace/releases
 if [ $# -gt 0 ]; then
 	tag=$1
 else
-	tag=$(curl -LsH 'Accept: application/json' $releases_uri/latest)
-	tag=${tag%\,\"update_url*}
-	tag=${tag##*tag_name\":\"}
-	tag=${tag%\"}
+	tag="1.0.11-grid-tabs"
 fi
 
 tag=${tag#v}
@@ -21,7 +18,7 @@ tag=${tag#v}
 echo "FETCHING Version $tag"
 
 download_uri=$releases_uri/download/v$tag/marketplace.zip
-    default_color_uri="https://raw.githubusercontent.com/spicetify/marketplace/main/resources/color.ini"
+    default_color_uri="https://raw.githubusercontent.com/suddelty/marketplace/fix/spotify-1.3-grid-and-tabs/resources/color.ini"
 
 SPICETIFY_CONFIG_DIR="$SPICETIFY_CONFIG"
 if [ -z "$SPICETIFY_CONFIG_DIR" ]; then
